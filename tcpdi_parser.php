@@ -936,7 +936,7 @@ class tcpdi_parser {
     protected function getIndirectObject($obj_ref, $offset=0, $decoding=true) {
         $obj = explode('_', $obj_ref);
         if (($obj === false) OR (count($obj) != 2)) {
-            $this->Error('Invalid object reference: '.$obj);
+            $this->Error('Invalid object reference: ' . json_encode($obj));
             return;
         }
         $objref = $obj[0].' '.$obj[1].' obj';
