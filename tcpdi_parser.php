@@ -156,7 +156,7 @@ class tcpdi_parser {
      * @private integer
      */
     private $pageno;
-        
+    
     /**
      * PDF version of the loaded document
      * @private string
@@ -349,8 +349,12 @@ class tcpdi_parser {
             // Cross-Reference
             $xref = $this->decodeXref($startxref, $xref);
         } else {
-            // Cross-Reference Stream
-            $xref = $this->decodeXrefStream($startxref, $xref);
+            try {
+                // Cross-Reference Stream
+                $xref = $this->decodeXrefStream($startxref, $xref);
+            } catch (\Exception $e){
+                $xref = $this->decodeXref($startxref, $xref);
+            }
         }
         if (empty($xref)) {
             $this->Error('Unable to find xref');
@@ -925,7 +929,7 @@ class tcpdi_parser {
     protected function getIndirectObject($obj_ref, $offset=0, $decoding=true) {
         $obj = explode('_', $obj_ref);
         if (($obj === false) OR (count($obj) != 2)) {
-            $this->Error('Invalid object reference: '.$obj);
+            $this->Error('Invalid object reference: '. json_encode($obj));
             return;
         }
         $objref = $obj[0].' '.$obj[1].' obj';
@@ -1299,7 +1303,7 @@ class tcpdi_parser {
             $tmp_box = $this->getObjectVal($box);
             $box = $tmp_box[1];
         }
-            
+        
         if (!is_null($box) && $box[0] == PDF_TYPE_ARRAY) {
             $b =& $box[1];
             return array('x' => $b[0][1] / $k,
@@ -1320,7 +1324,7 @@ class tcpdi_parser {
 
     /**
      * Get all page boxes by page no
-     * 
+     *
      * @param int The page number
      * @param float Scale factor from user space units to points
      * @return array
@@ -1384,10 +1388,12 @@ class tcpdi_parser {
      */
     public function Error($msg) {
         // exit program and print error
-        die('<strong>TCPDF_PARSER ERROR: </strong>'.$msg);
+        throw new TcpdiParserException($msg);
     }
 
 } // END OF TCPDF_PARSER CLASS
+
+class TcpdiParserException extends Exception {}
 
 //============================================================+
 // END OF FILE
