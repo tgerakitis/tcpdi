@@ -1250,7 +1250,7 @@ class tcpdi_parser {
             }
         }
 
-        if ($annots[0] == PDF_TYPE_OBJREF)
+        if (isset($annots[0]) && $annots[0] == PDF_TYPE_OBJREF)
             return $this->getObjectVal($annots);
         return $annots;
     }
